@@ -7,7 +7,7 @@ var calculatSeize = function () {
 	    clientWidth = docEl.clientWidth;
 		clientHeight = docEl.clientHeight;
 	if (!clientWidth) return;
-	var html_font_size = BASE_FONT_SIZE * ((clientWidth*roat) / 350);
+	var html_font_size = BASE_FONT_SIZE * ((clientWidth*roat) / 375);
 	docEl.style.fontSize = html_font_size + 'px';
 	// 如果只是在相应的-0.01~0.01之间的小数值，直接进行return掉
 	if (html_font_size-parseFloat(getComputedStyle(docEl).fontSize)<0.01 && html_font_size-parseFloat(getComputedStyle(docEl).fontSize)>-0.01) {
