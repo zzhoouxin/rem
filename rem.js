@@ -1,28 +1,44 @@
-//进行rem布局的自适应过程,默认设置的设计图纸为750
-var calculatSeize = function () {
-	var BASE_FONT_SIZE = 100;
-	var roat =1;
-	var wraps = document.getElementById('wrap_total');
-	var docEl = document.documentElement,
-	    clientWidth = docEl.clientWidth;
-		clientHeight = docEl.clientHeight;
-	if (!clientWidth) return;
-	var html_font_size = BASE_FONT_SIZE * ((clientWidth*roat) / 750);
-	docEl.style.fontSize = html_font_size + 'px';
-	// 如果只是在相应的-0.01~0.01之间的小数值，直接进行return掉
-	if (html_font_size-parseFloat(getComputedStyle(docEl).fontSize)<0.01 && html_font_size-parseFloat(getComputedStyle(docEl).fontSize)>-0.01) {
-		// 计算准确直接跳出
-		return;
+(function flexible (window, document) {
+	var docEl = document.documentElement
+	var dpr = window.devicePixelRatio || 1
+
+	// adjust body font size
+	function setBodyFontSize () {
+		if (document.body) {
+			document.body.style.fontSize = (12 * dpr) + 'px'
+		}
+		else {
+			document.addEventListener('DOMContentLoaded', setBodyFontSize)
+		}
 	}
-	// 在曲面屏手机存在着rem计算不准的问题
-	else {
-		var again_html_font_size = html_font_size/(parseInt(getComputedStyle(docEl).fontSize)/html_font_size);
-		docEl.style.fontSize = again_html_font_size + 'px';
+	setBodyFontSize();
+
+	// set 1rem = viewWidth / 10
+	function setRemUnit () {
+		var rem = docEl.clientWidth / 10
+		docEl.style.fontSize = rem + 'px'
 	}
-};
-if (document.addEventListener) {
-    var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
-    window.addEventListener(resizeEvt, calculatSeize, false);
-    document.addEventListener('DOMContentLoaded', calculatSeize, false);
-    calculatSeize();
-}
+
+	setRemUnit()
+
+	// reset rem unit on page resize
+	window.addEventListener('resize', setRemUnit)
+	window.addEventListener('pageshow', function (e) {
+		if (e.persisted) {
+			setRemUnit()
+		}
+	})
+
+	// detect 0.5px supports
+	if (dpr >= 2) {
+		var fakeBody = document.createElement('body')
+		var testElement = document.createElement('div')
+		testElement.style.border = '.5px solid transparent'
+		fakeBody.appendChild(testElement)
+		docEl.appendChild(fakeBody)
+		if (testElement.offsetHeight === 1) {
+			docEl.classList.add('hairlines')
+		}
+		docEl.removeChild(fakeBody)
+	}
+}(window, document))
